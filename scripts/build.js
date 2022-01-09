@@ -73,6 +73,15 @@ function bundleFile(package, file) {
                 writeToPackageDotJson(package, 'module', `dist/${file.replace('.js', '.esm.js')}`)
             })
         },
+        // Typings just have to be copied from the builds folder to the dist folder.
+        'alpine.d.ts': () => {
+            copy({
+                files: [{
+                    srcPath: `./packages/${package}/builds/${file}`,
+                    targetPath: `./packages/${package}/dist/${file}`
+                }],
+            })
+        }
     })[file]()
 }
 
@@ -99,6 +108,10 @@ function getFromPackageDotJson(package, key) {
     let dotJson = new DotJson(`./packages/${package}/package.json`)
 
     return dotJson.get(key)
+}
+
+function copy(options) {
+    options.files.forEach(file => fs.copyFileSync(file.srcPath, file.targetPath))
 }
 
 function outputSize(package, file) {
